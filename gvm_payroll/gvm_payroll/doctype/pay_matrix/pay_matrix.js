@@ -36,7 +36,20 @@ async function render_matrix(frm) {
 	}
 
 	// Sort levels numerically
-	levels.sort((a, b) => Number(a.level) - Number(b.level));
+	// Sort levels with numeric part first, then alpha suffix (e.g., 1 < 1A < 2)
+	const parseLevel = (val) => {
+		const m = String(val || "").match(/^(\d+)([A-Za-z]*)$/);
+		return {
+			num: m ? parseInt(m[1], 10) : Number.MAX_SAFE_INTEGER,
+			suffix: m ? m[2] || "" : "",
+		};
+	};
+	levels.sort((a, b) => {
+		const pa = parseLevel(a.level);
+		const pb = parseLevel(b.level);
+		if (pa.num !== pb.num) return pa.num - pb.num;
+		return pa.suffix.localeCompare(pb.suffix);
+	});
 
 	// Prepare matrix data
 	let all_years = new Set();
@@ -56,6 +69,7 @@ async function render_matrix(frm) {
 
 	// Build HTML table with styling
 	let html = `
+	<div class="pm-table-wrapper">
 	<table class="pay-matrix-grid">
 		<thead>
 			<tr>
@@ -87,8 +101,14 @@ async function render_matrix(frm) {
 	});
 
 	html += `</tbody></table>
+	</div>
 	<style>
+		.pm-table-wrapper {
+			width: 100%;
+			overflow-x: auto;
+		}
 		.pay-matrix-grid {
+			min-width: 960px;
 			width: 100%;
 			border-collapse: separate;
 			border-spacing: 0;
