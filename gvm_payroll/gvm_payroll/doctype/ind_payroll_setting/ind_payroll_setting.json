@@ -1,15 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:BULK-ADDITIONAL-SALARY-{YY}-{MM}-{DD}-{##}",
- "creation": "2025-12-09 12:59:07.654934",
+ "autoname": "field:company",
+ "creation": "2025-12-11 00:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "company",
-  "payroll_date",
-  "charges_section",
-  "charges"
+  "increment_dates_section",
+  "increment_dates"
  ],
  "fields": [
   {
@@ -18,38 +17,33 @@
    "in_list_view": 1,
    "label": "Company",
    "options": "Company",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
-   "fieldname": "payroll_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Payroll Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "charges_section",
+   "fieldname": "increment_dates_section",
    "fieldtype": "Section Break",
-   "label": "Charges"
+   "label": "Increment Dates"
   },
   {
    "allow_bulk_edit": 1,
-   "fieldname": "charges",
+   "fieldname": "increment_dates",
    "fieldtype": "Table",
-   "label": "Charges",
-   "options": "Bulk Additional Salary Item",
+   "label": "Increment Dates",
+   "options": "IND Payroll Setting Increment Date",
    "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_single": 0,
  "links": [],
- "modified": "2025-12-11 00:50:20.009323",
+ "modified": "2025-12-11 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Gvm Payroll",
- "name": "Bulk Additional Salary",
- "naming_rule": "Expression",
- "owner": "lijsamuael@gmail.com",
+ "name": "IND Payroll Setting",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
@@ -70,3 +64,4 @@
  "sort_order": "DESC",
  "states": []
 }
+

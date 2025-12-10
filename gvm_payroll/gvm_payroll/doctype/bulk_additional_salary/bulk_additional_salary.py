@@ -43,3 +43,32 @@ def create_additional_salaries(docname: str):
 		created.append(additional.name)
 
 	return {"created": created}
+
+
+@frappe.whitelist()
+def submit_additional_salaries(docname: str):
+	"""Submit all draft Additional Salary records linked to Bulk Additional Salary."""
+	doc = frappe.get_doc("Bulk Additional Salary", docname)
+	
+	# Get all draft additional salaries for this document
+	additional_salaries = frappe.get_all(
+		"Additional Salary",
+		filters={
+			"ref_doctype": "Bulk Additional Salary",
+			"ref_docname": docname,
+			"docstatus": 0,  # Draft
+		},
+		fields=["name"],
+	)
+	
+	if not additional_salaries:
+		frappe.throw("No draft Additional Salary records found to submit")
+	
+	submitted = []
+	for salary in additional_salaries:
+		salary_doc = frappe.get_doc("Additional Salary", salary.name)
+		salary_doc.submit()
+		submitted.append(salary.name)
+	
+	frappe.db.commit()
+	return {"submitted": submitted}
