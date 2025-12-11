@@ -1,7 +1,7 @@
-app_name = "gvm_payroll"
-app_title = "Gvm Payroll"
+app_name = "jvm_payroll"
+app_title = "JVM Payroll"
 app_publisher = "Samuael Ketema"
-app_description = "A Payroll App for indian GVM payroll with pay matrix."
+app_description = "A Payroll App for indian JVM payroll with pay matrix."
 app_email = "lijsamuael@gmail.com"
 app_license = "mit"
 
