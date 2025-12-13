@@ -1,0 +1,185 @@
+{%- if data and data|length > 0 -%}
+	{%- set first_row = data[0] -%}
+	{%- set meta = first_row._meta if first_row._meta else {} -%}
+	{%- set total_basic = meta.total_basic if meta.total_basic else 0 -%}
+	{%- set total_esi_employee = meta.total_esi_employee if meta.total_esi_employee else 0 -%}
+	{%- set total_esi_employer = meta.total_esi_employer if meta.total_esi_employer else 0 -%}
+	{%- set total_all = meta.total_all if meta.total_all else 0 -%}
+	{%- set employee_count = meta.employee_count if meta.employee_count else 0 -%}
+	{%- set company = meta.company if meta.company else "" -%}
+	{%- set month = meta.month if meta.month else "" -%}
+	{%- set year = meta.year if meta.year else "" -%}
+
+	{%- set company_name = "" -%}
+	{%- set company_address = "" -%}
+	{%- if company -%}
+		{%- set company_name = frappe.db.get_value("Company", company, "company_name") or company -%}
+		{%- set company_address = frappe.db.get_value("Company", company, "address_line_1") or "" -%}
+		{%- set company_city = frappe.db.get_value("Company", company, "city") or "" -%}
+		{%- set company_state = frappe.db.get_value("Company", company, "state") or "" -%}
+		{%- set company_pincode = frappe.db.get_value("Company", company, "pincode") or "" -%}
+		{%- if company_address or company_city or company_state or company_pincode -%}
+			{%- set address_parts = [] -%}
+			{%- if company_address -%}
+				{%- set _ = address_parts.append(company_address) -%}
+			{%- endif -%}
+			{%- if company_city -%}
+				{%- set _ = address_parts.append(company_city) -%}
+			{%- endif -%}
+			{%- if company_state -%}
+				{%- set _ = address_parts.append(company_state) -%}
+			{%- endif -%}
+			{%- if company_pincode -%}
+				{%- set _ = address_parts.append(company_pincode) -%}
+			{%- endif -%}
+			{%- set company_address = address_parts|join(", ") -%}
+		{%- endif -%}
+	{%- endif -%}
+
+	{%- set month_name = month if month else "" -%}
+	{%- set period = month_name + " " + year|string if month_name and year else "" -%}
+
+	<style>
+		.esi-report {
+			font-family: Arial, sans-serif;
+			font-size: 12px;
+			color: #000;
+		}
+		.header-section {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 20px;
+			margin-bottom: 20px;
+		}
+		.logo-container {
+			flex: 0 0 auto;
+		}
+		.logo-container img {
+			max-height: 60px;
+			max-width: 180px;
+		}
+		.company-info {
+			flex: 1 1 auto;
+			text-align: center;
+		}
+		.company-name {
+			font-size: 18px;
+			font-weight: bold;
+			color: #003399;
+			text-transform: uppercase;
+			margin-bottom: 4px;
+		}
+		.company-address {
+			font-size: 12px;
+			color: #003399;
+			margin-top: 2px;
+		}
+		.report-title-section {
+			border-top: 2px solid #000;
+			border-bottom: 2px solid #000;
+			padding: 10px 0;
+			margin: 20px 0;
+		}
+		.report-title {
+			text-align: center;
+			font-size: 16px;
+			font-weight: bold;
+			color: #003399;
+			text-transform: uppercase;
+		}
+		.period-info {
+			text-align: left;
+			font-size: 12px;
+			color: #003399;
+			margin-top: 10px;
+		}
+		.esi-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 20px;
+		}
+		.esi-table th,
+		.esi-table td {
+			border: 1px solid #000;
+			padding: 8px 10px;
+			text-align: center;
+		}
+		.esi-table th {
+			background-color: #f0f0f0;
+			font-weight: bold;
+		}
+		.esi-table td.text-left {
+			text-align: left;
+		}
+		.esi-table td.text-right {
+			text-align: right;
+		}
+		.total-row {
+			font-weight: bold;
+			background-color: #f9f9f9;
+		}
+		.total-row td:first-child {
+			text-align: left;
+		}
+	</style>
+
+	<div class="esi-report">
+		<div class="header-section">
+			<div class="logo-container">
+				<img src="/files/logo.png" alt="Logo" onerror="this.style.display='none'">
+			</div>
+			<div class="company-info">
+				<div class="company-name">{{ company_name }}</div>
+				{%- if company_address -%}
+					<div class="company-address">{{ company_address }}</div>
+				{%- endif -%}
+			</div>
+		</div>
+
+		<div class="report-title-section">
+			<div class="report-title">ESI Report</div>
+		</div>
+
+		<div class="period-info">
+			<strong>Year and Month :</strong> {{ period }}
+		</div>
+
+		<table class="esi-table">
+			<thead>
+				<tr>
+					<th>SL</th>
+					<th>Emp. ID</th>
+					<th>Emp. Name</th>
+					<th>BASIC</th>
+					<th>Employee Contribution</th>
+					<th>Employer Contribution</th>
+					<th>Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				{%- for row in data -%}
+					<tr>
+						<td>{{ row.idx }}</td>
+						<td>{{ row.employee }}</td>
+						<td class="text-left">{{ row.employee_name }}</td>
+						<td class="text-right">{{ frappe.utils.fmt_money(row.basic_salary or 0, currency="") }}</td>
+						<td class="text-right">{{ frappe.utils.fmt_money(row.esi_employee_contribution or 0, currency="") }}</td>
+						<td class="text-right">{{ frappe.utils.fmt_money(row.esi_employer_contribution or 0, currency="") }}</td>
+						<td class="text-right">{{ frappe.utils.fmt_money(row.total or 0, currency="") }}</td>
+					</tr>
+				{%- endfor -%}
+				<tr class="total-row">
+					<td colspan="3">Total No of Employees: {{ employee_count }}</td>
+					<td class="text-right">{{ frappe.utils.fmt_money(total_basic, currency="") }}</td>
+					<td class="text-right">{{ frappe.utils.fmt_money(total_esi_employee, currency="") }}</td>
+					<td class="text-right">{{ frappe.utils.fmt_money(total_esi_employer, currency="") }}</td>
+					<td class="text-right">{{ frappe.utils.fmt_money(total_all, currency="") }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+{%- else -%}
+	<div>No data available</div>
+{%- endif -%}
+
