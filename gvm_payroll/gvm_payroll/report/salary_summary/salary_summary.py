@@ -95,25 +95,50 @@ def get_earning_and_deduction_types(salary_slips):
 
 
 def update_column_width(ss, columns):
-	if ss.branch is not None:
-		columns[3].update({"width": 120})
-	if ss.department is not None:
-		columns[4].update({"width": 120})
-	if ss.designation is not None:
-		columns[5].update({"width": 120})
-	if ss.leave_without_pay is not None:
-		columns[9].update({"width": 120})
+	# Column widths are now compact and mostly fixed in the HTML layout.
+	# Keep this function for backwards compatibility but do not mutate
+	# column definitions here.
+	return
 
 
 def get_columns(earning_types, ded_types):
+	def _short_label(component):
+		"""Return a compact abbreviation for a salary component label.
+
+		- Single word: first 4 letters (lowercase)
+		- Multiple words: first 3 letters of first word + '.' + first 2 of next word
+		- Special handling for ESI employer / employee contribution to keep them distinct
+		"""
+		if not component:
+			return ""
+
+		raw = (component or "").strip()
+
+		# Normalised string for matching special cases
+		normalised = raw.replace("-", " ").replace("_", " ")
+		normalised = " ".join(normalised.split()).lower()
+
+		# Special cases requested
+		if "esi" in normalised and "employer" in normalised:
+			return "Esi. Er"
+		if "esi" in normalised and "employee" in normalised:
+			return "Esi. Ee"
+
+		words = normalised.split(" ")
+
+		if len(words) == 1:
+			w = words[0][:4]
+			return w.capitalize()
+
+		first = words[0][:3]
+		second = words[1][:2] if len(words) > 1 else ""
+		first_cap = first.capitalize()
+		second_cap = second.capitalize() if second else ""
+		abbr = f"{first_cap}. {second_cap}" if second_cap else first_cap
+		return abbr
+
+	# Base columns: only Employee and Employee Name before components
 	columns = [
-		{
-			"label": _("Salary Slip ID"),
-			"fieldname": "salary_slip_id",
-			"fieldtype": "Link",
-			"options": "Salary Slip",
-			"width": 150,
-		},
 		{
 			"label": _("Employee"),
 			"fieldname": "employee",
@@ -127,98 +152,37 @@ def get_columns(earning_types, ded_types):
 			"fieldtype": "Data",
 			"width": 140,
 		},
-		{
-			"label": _("Designation"),
-			"fieldname": "designation",
-			"fieldtype": "Link",
-			"options": "Designation",
-			"width": 110,
-		},
-		{
-			"label": _("Work Day"),
-			"fieldname": "total_working_days",
-			"fieldtype": "Float",
-			"width": 70,
-		},
-		{
-			"label": _("Wages Day"),
-			"fieldname": "payment_days",
-			"fieldtype": "Float",
-			"width": 70,
-		},
-		{
-			"label": _("LWOP"),
-			"fieldname": "leave_without_pay",
-			"fieldtype": "Float",
-			"width": 60,
-		},
-		{
-			"label": _("Date of Joining"),
-			"fieldname": "date_of_joining",
-			"fieldtype": "Date",
-			"width": 70,
-		},
-		{
-			"label": _("Branch"),
-			"fieldname": "branch",
-			"fieldtype": "Link",
-			"options": "Branch",
-			"width": -1,
-		},
-		{
-			"label": _("Department"),
-			"fieldname": "department",
-			"fieldtype": "Link",
-			"options": "Department",
-			"width": -1,
-		},
-		{
-			"label": _("Company"),
-			"fieldname": "company",
-			"fieldtype": "Link",
-			"options": "Company",
-			"width": 120,
-		},
-		{
-			"label": _("Start Date"),
-			"fieldname": "start_date",
-			"fieldtype": "Data",
-			"width": 80,
-		},
-		{
-			"label": _("End Date"),
-			"fieldname": "end_date",
-			"fieldtype": "Data",
-			"width": 80,
-		},
-		{
-			"label": _("Leave Without Pay"),
-			"fieldname": "leave_without_pay",
-			"fieldtype": "Float",
-			"width": 50,
-		},
-		{
-			"label": _("Absent Days"),
-			"fieldname": "absent_days",
-			"fieldtype": "Float",
-			"width": 50,
-		},
-		{
-			"label": _("Payment Days"),
-			"fieldname": "payment_days",
-			"fieldtype": "Float",
-			"width": 120,
-		},
 	]
+
+	# Ensure "Basic" (or similar) appears as the first component column
+	# right after Employee and Employee Name.
+	basic_labels = {"Basic", "Basic Pay", "BASIC"}
+	basic_component = None
+	for lbl in earning_types:
+		if lbl in basic_labels:
+			basic_component = lbl
+			break
+
+	if basic_component:
+		earning_types.remove(basic_component)
+		columns.append(
+			{
+				"label": _("Basic"),
+				"fieldname": frappe.scrub(basic_component),
+				"fieldtype": "Currency",
+				"options": "currency",
+				"width": 90,
+			}
+		)
 
 	for earning in earning_types:
 		columns.append(
 			{
-				"label": earning,
+				"label": _(_short_label(earning)),
 				"fieldname": frappe.scrub(earning),
 				"fieldtype": "Currency",
 				"options": "currency",
-				"width": 120,
+				"width": 90,
 			}
 		)
 
@@ -235,11 +199,11 @@ def get_columns(earning_types, ded_types):
 	for deduction in ded_types:
 		columns.append(
 			{
-				"label": deduction,
+				"label": _(_short_label(deduction)),
 				"fieldname": frappe.scrub(deduction),
 				"fieldtype": "Currency",
 				"options": "currency",
-				"width": 120,
+				"width": 90,
 			}
 		)
 
