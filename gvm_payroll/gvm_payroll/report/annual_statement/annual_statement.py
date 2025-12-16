@@ -97,9 +97,9 @@ def execute(filters=None):
 			house_rent_total = 0.0
 			
 			# House Rent
-			house_rent = get_component_amount(earnings_map, ["House Rent", "HRA", "House Rent Allowance"])
+			house_rent = get_component_amount(earnings_map, ["House Rent", "HRA", ])
 			if house_rent == 0:
-				house_rent = get_component_amount(deductions_map, ["House Rent", "HRA", "House Rent Allowance"])
+				house_rent = get_component_amount(deductions_map, ["House Rent", "HRA",])
 			house_rent_total += house_rent
 			
 			# Water Charges
