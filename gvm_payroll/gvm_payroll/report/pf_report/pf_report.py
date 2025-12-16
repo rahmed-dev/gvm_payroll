@@ -79,8 +79,10 @@ def execute(filters=None):
 					da_amount = flt(earnings_map[key])
 					break
 		
-		# PF wages = Basic + DA
+		# PF wages = Basic + DA (capped at 15000)
 		pf_wages = flt(basic_amount + da_amount, 2)
+		if pf_wages > 15000:
+			pf_wages = 15000.0
 		
 		# EPS wages = Employee Pension Scheme
 		eps_wages = 0.0
@@ -111,32 +113,11 @@ def execute(filters=None):
 				pf_employee_cont = flt(ss_ded_map[ss.name][comp])
 				break
 		
-		# Get ESI-Employer Contribution
-		esi_employer_cont = 0.0
-		esi_employer_components = [
-			"ESI-Employer Contribution",
-			"ESI Employer Contribution",
-			"ESI - Employer Contribution",
-		]
-		# First try exact matches
-		for comp in esi_employer_components:
-			if comp in earnings_map:
-				esi_employer_cont = flt(earnings_map[comp])
-				break
+		# Employer to EPS = 8.33% of PF wages (capped at 15000)
+		employer_to_eps = flt(pf_wages * 0.0833, 2)
 		
-		# If not found, try case-insensitive and partial matches
-		if esi_employer_cont == 0:
-			for key in earnings_map.keys():
-				key_lower = key.lower().strip()
-				if ("esi" in key_lower and "employer" in key_lower and "contribution" in key_lower):
-					esi_employer_cont = flt(earnings_map[key])
-					break
-		
-		# Employer to EPS = 8.33% of ESI-Employer Contribution
-		employer_to_eps = flt(esi_employer_cont * 0.0833, 2)
-		
-		# Employer to PF = 3.67% of ESI-Employer Contribution
-		employer_to_pf = flt(esi_employer_cont * 0.0367, 2)
+		# Employer to PF = 3.67% of PF wages (capped at 15000)
+		employer_to_pf = flt(pf_wages * 0.0367, 2)
 
 		row = {
 			"uan": uan,
