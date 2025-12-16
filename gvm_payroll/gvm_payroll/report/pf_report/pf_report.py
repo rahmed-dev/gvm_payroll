@@ -36,24 +36,51 @@ def execute(filters=None):
 		# Gross Salary
 		gross_salary = flt(ss.gross_pay)
 		
+		# Get earnings map for this salary slip
+		earnings_map = ss_earning_map.get(ss.name, {})
+		
 		# Get Basic Salary
 		basic_amount = 0.0
 		basic_components = ["Basic Salary", "Basic", "BASIC"]
+		
+		# First try exact matches
 		for comp in basic_components:
-			if comp in ss_earning_map.get(ss.name, {}):
-				basic_amount = flt(ss_earning_map[ss.name][comp])
+			if comp in earnings_map:
+				basic_amount = flt(earnings_map[comp])
 				break
 		
-		# Get Dearness Allowances (DA)
+		# If not found, try case-insensitive match
+		if basic_amount == 0:
+			for key in earnings_map.keys():
+				key_lower = key.lower().strip()
+				if key_lower in [c.lower() for c in basic_components] or \
+				   (key_lower.startswith("basic") and len(key_lower) < 20):
+					basic_amount = flt(earnings_map[key])
+					break
+		
+		# Get Dearness Allowances (DA) - search with case-insensitive and partial matching
 		da_amount = 0.0
-		da_components = ["Dearness Allowances", "Dearness Allowance", "DA", "D.A."]
+		da_components = ["Dearness Allowences", "Dearness Allowence", "DA", "D.A.", "Dearness"]
+		
+		# First try exact matches
 		for comp in da_components:
-			if comp in ss_earning_map.get(ss.name, {}):
-				da_amount = flt(ss_earning_map[ss.name][comp])
+			if comp in earnings_map:
+				da_amount = flt(earnings_map[comp])
 				break
+		
+		# If not found, try case-insensitive and partial matches
+		if da_amount == 0:
+			for key in earnings_map.keys():
+				key_lower = key.lower().strip()
+				# Check for "dearness" or "allowence" (with typo) or standalone "da"
+				if ("dearness" in key_lower and "allowence" in key_lower) or \
+				   (key_lower == "da" or key_lower == "d.a.") or \
+				   ("dearness" in key_lower and len(key_lower) < 20):
+					da_amount = flt(earnings_map[key])
+					break
 		
 		# PF wages = Basic + DA
-		pf_wages = basic_amount + da_amount
+		pf_wages = flt(basic_amount + da_amount, 2)
 		
 		# EPS wages = Employee Pension Scheme
 		eps_wages = 0.0
@@ -84,11 +111,32 @@ def execute(filters=None):
 				pf_employee_cont = flt(ss_ded_map[ss.name][comp])
 				break
 		
-		# Employer to EPS = 8.33% of PF wages
-		employer_to_eps = flt(pf_wages * 0.0833, 2)
+		# Get ESI-Employer Contribution
+		esi_employer_cont = 0.0
+		esi_employer_components = [
+			"ESI-Employer Contribution",
+			"ESI Employer Contribution",
+			"ESI - Employer Contribution",
+		]
+		# First try exact matches
+		for comp in esi_employer_components:
+			if comp in earnings_map:
+				esi_employer_cont = flt(earnings_map[comp])
+				break
 		
-		# Employer to PF = 3.67% of PF wages
-		employer_to_pf = flt(pf_wages * 0.0367, 2)
+		# If not found, try case-insensitive and partial matches
+		if esi_employer_cont == 0:
+			for key in earnings_map.keys():
+				key_lower = key.lower().strip()
+				if ("esi" in key_lower and "employer" in key_lower and "contribution" in key_lower):
+					esi_employer_cont = flt(earnings_map[key])
+					break
+		
+		# Employer to EPS = 8.33% of ESI-Employer Contribution
+		employer_to_eps = flt(esi_employer_cont * 0.0833, 2)
+		
+		# Employer to PF = 3.67% of ESI-Employer Contribution
+		employer_to_pf = flt(esi_employer_cont * 0.0367, 2)
 
 		row = {
 			"uan": uan,
