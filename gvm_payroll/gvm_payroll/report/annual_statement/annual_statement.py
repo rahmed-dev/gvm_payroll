@@ -93,23 +93,40 @@ def execute(filters=None):
 			monthly_data[month_key]["ta"] += ta
 
 			# House Rent = House Rent + Water Charges + Garbage Maintainence + Servant Charge + Parking Charge
-			# Check both earnings and deductions
+			# Check both earnings and deductions, only add if component exists
+			house_rent_total = 0.0
+			
+			# House Rent
 			house_rent = get_component_amount(earnings_map, ["House Rent", "HRA", "House Rent Allowance"])
-			house_rent += get_component_amount(deductions_map, ["House Rent", "HRA", "House Rent Allowance"])
+			if house_rent == 0:
+				house_rent = get_component_amount(deductions_map, ["House Rent", "HRA", "House Rent Allowance"])
+			house_rent_total += house_rent
 			
+			# Water Charges
 			water = get_component_amount(earnings_map, ["Water Charges", "Water", "Water Charge"])
-			water += get_component_amount(deductions_map, ["Water Charges", "Water", "Water Charge"])
+			if water == 0:
+				water = get_component_amount(deductions_map, ["Water Charges", "Water", "Water Charge"])
+			house_rent_total += water
 			
+			# Garbage Maintainence
 			garbage = get_component_amount(earnings_map, ["Garbage Maintainence", "Garbage Maintenance", "Garbage", "Garbage Maintainence"])
-			garbage += get_component_amount(deductions_map, ["Garbage Maintainence", "Garbage Maintenance", "Garbage", "Garbage Maintainence"])
+			if garbage == 0:
+				garbage = get_component_amount(deductions_map, ["Garbage Maintainence", "Garbage Maintenance", "Garbage", "Garbage Maintainence"])
+			house_rent_total += garbage
 			
+			# Servant Charge
 			servant = get_component_amount(earnings_map, ["Servant Charge", "Servant", "Servant Charges"])
-			servant += get_component_amount(deductions_map, ["Servant Charge", "Servant", "Servant Charges"])
+			if servant == 0:
+				servant = get_component_amount(deductions_map, ["Servant Charge", "Servant", "Servant Charges"])
+			house_rent_total += servant
 			
+			# Parking Charge
 			parking = get_component_amount(earnings_map, ["Parking Charge", "Parking", "Parking Charges"])
-			parking += get_component_amount(deductions_map, ["Parking Charge", "Parking", "Parking Charges"])
+			if parking == 0:
+				parking = get_component_amount(deductions_map, ["Parking Charge", "Parking", "Parking Charges"])
+			house_rent_total += parking
 			
-			monthly_data[month_key]["house_rent"] += (house_rent + water + garbage + servant + parking)
+			monthly_data[month_key]["house_rent"] += house_rent_total
 
 			# Grinsur = Group Insurance
 			grinsur = get_component_amount(deductions_map, ["Group Insurance", "Group Ins", "Grinsur", "Group Insur"])
@@ -215,15 +232,16 @@ def execute(filters=None):
 		# Qualifying amount = total savings with limit of 150000
 		qualifying_amt = min(total_savings, 150000.0)
 
-		# Taxable income = total earnings - 50000
-		taxable_income = total_earnings - 50000.0
+		# Taxable income = IncomeSal head - Qualifying amount
+		taxable_income = income_sal_head - qualifying_amt
 
-		# Get current month (last processed month with data)
-		current_month_key = None
-		for month_key in sorted(monthly_data.keys(), reverse=True):
-			if monthly_data[month_key]["basic"] > 0:
-				current_month_key = month_key
-				break
+		# Get current month (use source month if we copied data, otherwise find last month with data)
+		current_month_key = source_month if source_month else None
+		if not current_month_key:
+			for month_key in sorted(monthly_data.keys(), reverse=True):
+				if monthly_data[month_key]["basic"] > 0:
+					current_month_key = month_key
+					break
 
 		# Calculate months passed from April to current month
 		if current_month_key:
@@ -231,12 +249,19 @@ def execute(filters=None):
 		else:
 			months_passed = 12
 
-		# Tax payable = 12 * current_month_income_tax (from last month with data)
-		last_month_tax = monthly_data.get(current_month_key, {}).get("current_month_income_tax", 0.0) if current_month_key else 0.0
-		tax_payable = flt(last_month_tax * 12, 2)
+		# Tax payable = 12 * current_month_income_tax (from source month or last month with data)
+		# Get the tax from the source month (the one we found with data)
+		if source_month:
+			current_month_tax = monthly_data[source_month].get("current_month_income_tax", 0.0)
+		elif current_month_key:
+			current_month_tax = monthly_data[current_month_key].get("current_month_income_tax", 0.0)
+		else:
+			current_month_tax = 0.0
+		
+		tax_payable = flt(current_month_tax * 12, 2)
 
-		# Itax paid = sum of all current_month_income_tax from April to current month
-		itax_paid = flt(sum(m["current_month_income_tax"] for m in monthly_data.values()), 2)
+		# Itax paid = months_passed (from April to current month) * current_month_income_tax
+		itax_paid = flt(months_passed * current_month_tax, 2)
 
 		# Bal to pay = tax payable - itax paid
 		bal_to_pay = flt(tax_payable - itax_paid, 2)
