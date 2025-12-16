@@ -334,8 +334,9 @@ def execute(filters=None):
 		# Bal to pay = tax payable - itax paid
 		bal_to_pay = flt(tax_payable - itax_paid, 2)
 
-		# New Mly Dedn = bal to pay / months_passed (if months_passed > 0)
-		new_mly_dedn = flt(bal_to_pay / months_passed, 2) if months_passed > 0 else 0.0
+		# New Mly Dedn = bal to pay / remaining months in FY
+		remaining_months = max(1, 12 - months_passed)
+		new_mly_dedn = flt(bal_to_pay / remaining_months, 2)
 
 		# Build row data
 		row = {
