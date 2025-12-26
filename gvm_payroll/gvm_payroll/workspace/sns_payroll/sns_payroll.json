@@ -1,0 +1,208 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"gT4H1uuVnD\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">SNS Payroll</span>\",\"col\":12}},{\"id\":\"He3yozwq3w\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Employees\",\"col\":3}},{\"id\":\"vams65LUqM\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Employee Exits (This Year)\",\"col\":3}},{\"id\":\"IbO8NqShUj\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"K5GpvRAG3b\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee\",\"col\":3}},{\"id\":\"9VHxhDur44\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"J4MiErzf7Y\",\"type\":\"card\",\"data\":{\"card_name\":\"Additional Salary\",\"col\":4}},{\"id\":\"gPBUxoHgLG\",\"type\":\"card\",\"data\":{\"card_name\":\"Payroll Processing\",\"col\":4}},{\"id\":\"8skgSpK90P\",\"type\":\"card\",\"data\":{\"card_name\":\"SNS Reports\",\"col\":4}},{\"id\":\"ydCseH9E-J\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"tu7jRhndt2\",\"type\":\"card\",\"data\":{\"card_name\":\"Configuration\",\"col\":3}}]",
+ "creation": "2025-12-22 12:50:01.623234",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "share-people",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "SNS Payroll",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Component",
+   "link_count": 0,
+   "link_to": "Salary Component",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Structure",
+   "link_count": 0,
+   "link_to": "Salary Structure",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Structure Assignment",
+   "link_count": 0,
+   "link_to": "Salary Structure Assignment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "SNS Reports",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "PF Report",
+   "link_count": 0,
+   "link_to": "PF Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Salary Summary",
+   "link_count": 0,
+   "link_to": "Salary Summary",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Bank Cover Letter",
+   "link_count": 0,
+   "link_to": "Bank Cover Letter",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Attendance Sheet",
+   "link_count": 0,
+   "link_to": "Monthly Attendance Sheet",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Additional Salary",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Additional Salary",
+   "link_count": 0,
+   "link_to": "Additional Salary",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Bulk Additional Salary",
+   "link_count": 0,
+   "link_to": "Bulk Additional Salary",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Payroll Processing",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Attendance",
+   "link_count": 0,
+   "link_to": "Attendance",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Payroll Entry",
+   "link_count": 0,
+   "link_to": "Payroll Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Slip",
+   "link_count": 0,
+   "link_to": "Salary Slip",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-12-26 15:42:13.839107",
+ "modified_by": "Administrator",
+ "module": "Gvm Payroll",
+ "name": "SNS Payroll",
+ "number_cards": [
+  {
+   "label": "Active Employees",
+   "number_card_name": "Total Employees"
+  },
+  {
+   "label": "Employee Exits (This Year)",
+   "number_card_name": "Employee Exits (This Year)"
+  }
+ ],
+ "owner": "rizwanazmat2000@gmail.com",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "SNS User"
+  }
+ ],
+ "sequence_id": 23.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Employee",
+   "link_to": "Employee",
+   "stats_filter": "[[\"Employee\",\"company\",\"=\",\"Shiksha Niketan\",false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "SNS Payroll"
+}

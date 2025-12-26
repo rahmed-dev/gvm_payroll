@@ -5,3 +5,10 @@
 tags
 node_modules
 __pycache__
+
+# Documentation
+docs/
+
+# Flattened codebase
+flattened-codebase.xml
+*.stats.md
