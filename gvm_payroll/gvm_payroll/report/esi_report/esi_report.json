@@ -11,7 +11,7 @@
  "is_standard": "Yes",
  "json": "",
  "letter_head": null,
- "modified": "2025-12-13 00:00:00",
+ "modified": "2025-12-26 12:54:06.691094",
  "modified_by": "Administrator",
  "module": "Gvm Payroll",
  "name": "ESI Report",
@@ -23,8 +23,13 @@
  "roles": [
   {
    "role": "System Manager"
+  },
+  {
+   "role": "JVM User"
+  },
+  {
+   "role": "SNS User"
   }
  ],
  "timeout": 0
 }
-

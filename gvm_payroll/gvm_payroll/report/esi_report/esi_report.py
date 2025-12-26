@@ -22,10 +22,26 @@ def execute(filters=None):
 	ss_earning_map = get_salary_slip_details(salary_slips, "earnings")
 	ss_ded_map = get_salary_slip_details(salary_slips, "deductions")
 
-	# Salary Components (exact names)
-	BASIC_COMPONENT = "Basic Salary"
-	ESI_EMPLOYEE_COMPONENT = "ESI - Employee Contribution"
-	ESI_EMPLOYER_COMPONENT = "ESI-Employer Contribution"
+	# Get component names dynamically based on company and custom_report_type
+	component_names = get_component_names_by_report_type(company)
+	BASIC_COMPONENT = component_names.get("basic")
+	ESI_EMPLOYEE_COMPONENT = component_names.get("esi_employee")
+	ESI_EMPLOYER_COMPONENT = component_names.get("esi_employer")
+
+	# Validate all required components are configured
+	missing_components = []
+	if not BASIC_COMPONENT:
+		missing_components.append("Basic (Report Type: Basic)")
+	if not ESI_EMPLOYEE_COMPONENT:
+		missing_components.append("ESI Employee (Report Type: ESI Employee)")
+	if not ESI_EMPLOYER_COMPONENT:
+		missing_components.append("ESI Employer (Report Type: ESI Employer)")
+
+	if missing_components:
+		frappe.throw(_(
+			"Following salary components are not configured for company {0}:<br><br>{1}<br><br>"
+			"Please set 'Report Type' field in Salary Components for this company."
+		).format(company, "<br>".join(f"• {comp}" for comp in missing_components)))
 
 	columns = get_columns()
 
@@ -163,6 +179,32 @@ def get_salary_slip_details(salary_slips, component_type):
 		ss_map[d.parent][d.salary_component] += flt(d.amount)
 
 	return ss_map
+
+
+def get_component_names_by_report_type(company):
+	"""
+	Fetch salary component names based on custom_report_type field.
+	Returns dict with component names for Basic, ESI Employee and ESI Employer.
+	"""
+	components = frappe.get_all(
+		"Salary Component",
+		filters={
+			"custom_company": company,
+			"custom_report_type": ["in", ["Basic", "ESI Employee", "ESI Employer"]]
+		},
+		fields=["name", "custom_report_type"]
+	)
+
+	component_map = {}
+	for comp in components:
+		if comp.custom_report_type == "Basic":
+			component_map["basic"] = comp.name
+		elif comp.custom_report_type == "ESI Employee":
+			component_map["esi_employee"] = comp.name
+		elif comp.custom_report_type == "ESI Employer":
+			component_map["esi_employer"] = comp.name
+
+	return component_map
 
 
 
