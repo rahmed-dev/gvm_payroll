@@ -31,8 +31,8 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-08 16:29:35.777887",
- "modified_by": "lijsamuael@gmail.com",
+ "modified": "2025-12-26 12:52:50.893919",
+ "modified_by": "Administrator",
  "module": "Gvm Payroll",
  "name": "Charge Type",
  "owner": "lijsamuael@gmail.com",
@@ -46,6 +46,18 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
    "share": 1,
    "write": 1
   }

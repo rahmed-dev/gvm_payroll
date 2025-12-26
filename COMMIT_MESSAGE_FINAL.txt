@@ -1,0 +1,40 @@
+feat: ESI Report - Dynamic components and professional print format
+
+Enhanced ESI Report with multi-company support and standardized print layout.
+
+Changes:
+1. Dynamic Component Selection
+   - Replaced hard-coded component names with custom_report_type field lookup
+   - Query components by Company + Report Type (Basic, ESI Employee, ESI Employer)
+   - Added validation with detailed error messages
+   - Removed hard-coded: "Basic Salary", "ESI - Employee Contribution", "ESI-Employer Contribution"
+
+2. Professional Print Format
+   - Created JS-based print format with company standard layout
+   - "ESI Report" title with Year/Month header
+   - Clean table design with Indian number formatting
+   - Employee count and totals in footer
+   - Print-optimized CSS
+
+3. Documentation
+   - Comprehensive setup guides in docs/reports/
+   - Multi-company configuration guide
+   - Changelog with migration notes
+   - Print format implementation code
+
+Benefits:
+- Multi-company support with different component naming
+- No code changes needed for component variations
+- User-configurable via Salary Component UI
+- Professional, standardized report output
+
+Breaking Change:
+- Requires Report Type field configuration on Salary Components
+- Configuration per company required
+
+Files Modified:
+- gvm_payroll/report/esi_report/esi_report.py
+- docs/ (new directory structure with comprehensive documentation)
+
+Configuration: See docs/changelogs/2025-12-26-esi-report-complete.md
+Print Format: See docs/reports/esi-report-print-format-v2.md
