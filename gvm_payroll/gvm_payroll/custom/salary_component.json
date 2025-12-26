@@ -173,7 +173,7 @@
    "name": "Salary Component-custom_report_type",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "\nBasic\nPF Employee\nPF Employer\nPension\nESI Employee\nESI Employer\nFDA\nVDA\nEDLI",
+   "options": "\nBasic\nPF Employee\nPF Employer\nPension\nESI Employee\nESI Employer\nFDA\nVDA\nEDLI\nAdmin Charge",
    "owner": "Administrator",
    "permlevel": 0,
    "placeholder": null,

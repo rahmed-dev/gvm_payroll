@@ -37,6 +37,8 @@ def execute(filters=None):
 	PF_EMPLOYEE_COMPONENT = component_names.get("pf_employee")
 	PF_EMPLOYER_COMPONENT = component_names.get("pf_employer")
 	PENSION_COMPONENT = component_names.get("pension")
+	ADMIN_CHARGES_COMPONENT = component_names.get("admin_charges")
+	EDLI_COMPONENT = component_names.get("edli")
 
 	# Validate required components are configured
 	missing_components = []
@@ -62,6 +64,8 @@ def execute(filters=None):
 	total_employee_share = 0.0
 	total_employer_share = 0.0
 	total_pension = 0.0
+	total_admin_charges = 0.0
+	total_edli = 0.0
 
 	for idx, ss in enumerate(salary_slips, start=1):
 
@@ -88,6 +92,22 @@ def execute(filters=None):
 			ss_ded_map.get(ss.name, {}).get(PENSION_COMPONENT, 0)
 		)
 
+		# Admin Charges (from earnings or deductions - check both)
+		admin_charges_amount = 0.0
+		if ADMIN_CHARGES_COMPONENT:
+			admin_charges_amount = flt(
+				ss_earning_map.get(ss.name, {}).get(ADMIN_CHARGES_COMPONENT, 0) or
+				ss_ded_map.get(ss.name, {}).get(ADMIN_CHARGES_COMPONENT, 0)
+			)
+
+		# EDLI (from earnings or deductions - check both)
+		edli_amount = 0.0
+		if EDLI_COMPONENT:
+			edli_amount = flt(
+				ss_earning_map.get(ss.name, {}).get(EDLI_COMPONENT, 0) or
+				ss_ded_map.get(ss.name, {}).get(EDLI_COMPONENT, 0)
+			)
+
 		row = frappe._dict({
 			"idx": idx,
 			"employee": ss.employee,
@@ -105,6 +125,8 @@ def execute(filters=None):
 		total_employee_share += employee_share
 		total_employer_share += employer_share
 		total_pension += pension_contribution
+		total_admin_charges += admin_charges_amount
+		total_edli += edli_amount
 
 	# Calculate summary amounts
 	if data:
@@ -114,11 +136,11 @@ def execute(filters=None):
 		# Employee Pension Fund A/C no 10 = Total Pension
 		pension_fund = flt(total_pension, 2)
 
-		# Administrative charges A/C no II = 0.5% of total PF Wages
-		admin_charges = flt(total_pf_wages * 0.005, 2)
+		# Administrative charges A/C no II - from salary components
+		admin_charges = flt(total_admin_charges, 2)
 
-		# E.D.L.I A/c no 21 = 0.5% of total PF Wages
-		edli = flt(total_pf_wages * 0.005, 2)
+		# E.D.L.I A/c no 21 - from salary components
+		edli = flt(total_edli, 2)
 
 		# TOTAL = EPF A/c I + Pension Fund + Admin Charges + EDLI
 		grand_total = flt(epf_account_1 + pension_fund + admin_charges + edli, 2)
@@ -224,13 +246,13 @@ def get_salary_slip_details(salary_slips, component_type):
 def get_component_names_by_report_type(company):
 	"""
 	Fetch salary component names based on custom_report_type field.
-	Returns dict with component names for Basic, VDA, FDA, PF Employee, PF Employer, and Pension.
+	Returns dict with component names for Basic, VDA, FDA, PF Employee, PF Employer, Pension, Admin Charges, and EDLI.
 	"""
 	components = frappe.get_all(
 		"Salary Component",
 		filters={
 			"custom_company": company,
-			"custom_report_type": ["in", ["Basic", "VDA", "FDA", "PF Employee", "PF Employer", "Pension"]]
+			"custom_report_type": ["in", ["Basic", "VDA", "FDA", "PF Employee", "PF Employer", "Pension", "Admin Charges", "EDLI"]]
 		},
 		fields=["name", "custom_report_type"]
 	)
@@ -250,5 +272,9 @@ def get_component_names_by_report_type(company):
 			component_map["pf_employer"] = comp.name
 		elif report_type == "Pension":
 			component_map["pension"] = comp.name
+		elif report_type == "Admin Charges":
+			component_map["admin_charges"] = comp.name
+		elif report_type == "EDLI":
+			component_map["edli"] = comp.name
 
 	return component_map
