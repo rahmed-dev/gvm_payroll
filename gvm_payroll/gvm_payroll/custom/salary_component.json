@@ -237,7 +237,7 @@
    "name": "Salary Component-custom_report_type",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "\nBasic\nPF Employee\nPF Employer\nPension\nESI Employee\nESI Employer\nFDA\nVDA\nEDLI\nAdmin Charge\nArrear\nProf Tax",
+   "options": "\nBasic\nConsolidated Allowance\nConveyance Allowance\nAP\nHRA\nFDA\nVDA\nPF Employee\nPF Employer\nPension\nESI Employee\nESI Employer\nEDLI\nAdmin Charge\nArrear\nProf Tax\nLIC\nHouse Rent\nTDS",
    "owner": "Administrator",
    "permlevel": 0,
    "placeholder": null,
