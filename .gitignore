@@ -11,4 +11,5 @@ docs/
 
 # Flattened codebase
 flattened-codebase.xml
-*.stats.md
+*.stats.mdflattened-gvm-payroll.xml
+flattened-gvm-payroll.xml
