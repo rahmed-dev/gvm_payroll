@@ -137,13 +137,11 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Salary Slip": {
+		"before_save": "gvm_payroll.gvm_payroll.overrides.salary_slip.split_internal_components"
+	}
+}
 
 # Scheduled Tasks
 # ---------------

@@ -7,7 +7,7 @@ frappe.ui.form.on("Bulk Additional Salary", {
 		frm.page.clear_actions();
 		frm.page.btn_create_additional_salaries = null;
 		frm.page.btn_submit_additional_salaries = null;
-		
+
 		// Before saving: NO button visible - return immediately
 		if (frm.doc.__islocal) {
 			return;
@@ -16,6 +16,49 @@ frappe.ui.form.on("Bulk Additional Salary", {
 		// After saving: check if additional salaries exist
 		check_and_show_buttons(frm);
 	},
+
+	// When default quarter changes, populate existing empty rows
+	default_quarter: function(frm) {
+		if (frm.doc.default_quarter && frm.doc.charges) {
+			frm.doc.charges.forEach(function(row) {
+				// Only populate if row's quarter is empty
+				if (!row.quarter) {
+					frappe.model.set_value(row.doctype, row.name, 'quarter', frm.doc.default_quarter);
+				}
+			});
+		}
+		frm.refresh_field('charges');
+	},
+
+	// When default salary component changes, populate existing empty rows
+	default_salary_component: function(frm) {
+		if (frm.doc.default_salary_component && frm.doc.charges) {
+			frm.doc.charges.forEach(function(row) {
+				// Only populate if row's salary component is empty
+				if (!row.salary_component) {
+					frappe.model.set_value(row.doctype, row.name, 'salary_component', frm.doc.default_salary_component);
+				}
+			});
+		}
+		frm.refresh_field('charges');
+	}
+});
+
+// Auto-populate default values when new row is added to charges table
+frappe.ui.form.on("Bulk Additional Salary Item", {
+	charges_add: function(frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+
+		// Only populate if fields are empty (new row)
+		// This ensures we don't overwrite existing data
+		if (!row.quarter && frm.doc.default_quarter) {
+			frappe.model.set_value(cdt, cdn, 'quarter', frm.doc.default_quarter);
+		}
+
+		if (!row.salary_component && frm.doc.default_salary_component) {
+			frappe.model.set_value(cdt, cdn, 'salary_component', frm.doc.default_salary_component);
+		}
+	}
 });
 
 async function check_and_show_buttons(frm) {

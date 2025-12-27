@@ -8,6 +8,10 @@
  "field_order": [
   "company",
   "payroll_date",
+  "section_break_chfg",
+  "default_quarter",
+  "column_break_xwgn",
+  "default_salary_component",
   "charges_section",
   "charges"
  ],
@@ -39,12 +43,32 @@
    "label": "Charges",
    "options": "Bulk Additional Salary Item",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_break_chfg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "default_quarter",
+   "fieldtype": "Link",
+   "label": "Default Quarter",
+   "options": "Quarter"
+  },
+  {
+   "fieldname": "column_break_xwgn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_salary_component",
+   "fieldtype": "Link",
+   "label": "Default Salary Component",
+   "options": "Salary Component"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-26 12:52:19.974590",
+ "modified": "2025-12-27 12:14:53.850832",
  "modified_by": "Administrator",
  "module": "Gvm Payroll",
  "name": "Bulk Additional Salary",
