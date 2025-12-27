@@ -63,7 +63,7 @@ def execute(filters=None):
 		row["house_rent"] = slip_components.get("House Rent", 0)
 		row["tds"] = slip_components.get("TDS", 0)
 		row["prof_tax"] = slip_components.get("Prof Tax", 0)
-		row["loans_against_salary"] = flt(ss.total_loan_repayment)
+		row["loans_against_salary"] = slip_components.get("Loan Deduction", 0)
 		row["employee_epf"] = slip_components.get("PF Employee", 0)
 		row["employee_esic"] = slip_components.get("ESI Employee", 0)
 

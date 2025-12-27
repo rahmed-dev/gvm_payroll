@@ -17,8 +17,10 @@ def split_internal_components(doc, method=None):
 	- doc.deductions → doc.custom_internal_salary_details
 	"""
 	# Performance optimization: Skip if nothing changed
-	if not doc.has_value_changed(["earnings", "deductions"]):
-		return
+	# BUT always run during submit to ensure components stay split
+	if doc.docstatus == 0:  # Only optimize for draft saves
+		if not (doc.has_value_changed("earnings") or doc.has_value_changed("deductions")):
+			return
 
 	# Clear existing internal components to avoid duplicates
 	doc.custom_internal_salary_details = []
