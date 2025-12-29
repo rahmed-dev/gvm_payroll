@@ -139,8 +139,14 @@ app_license = "mit"
 
 doc_events = {
 	"Salary Slip": {
-		"before_save": "gvm_payroll.gvm_payroll.overrides.salary_slip.split_internal_components",
-		"before_submit": "gvm_payroll.gvm_payroll.overrides.salary_slip.split_internal_components"
+		"before_save": [
+			"gvm_payroll.gvm_payroll.overrides.salary_slip.split_internal_components",
+			"gvm_payroll.gvm_payroll.overrides.salary_slip.calculate_unpaid_days"
+		],
+		"before_submit": [
+			"gvm_payroll.gvm_payroll.overrides.salary_slip.split_internal_components",
+			"gvm_payroll.gvm_payroll.overrides.salary_slip.calculate_unpaid_days"
+		]
 	}
 }
 

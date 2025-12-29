@@ -118,3 +118,59 @@ def calculate_internal_total(doc):
 
 	# Set the total to the custom field
 	doc.custom_gross_internal_payable = total
+
+
+def calculate_unpaid_days(doc, method=None):
+	"""
+	Calculate total unpaid days for the employee from Unpaid Days doctype.
+
+	Runs on before_save hook - after Frappe's standard salary slip calculations.
+	Queries all submitted Unpaid Days documents where payroll_date falls between
+	the salary slip's start_date and end_date, then sums the days for this employee.
+
+	Args:
+		doc: Salary Slip document
+		method: Hook method name (optional)
+	"""
+	# Skip if required fields are missing
+	if not doc.employee or not doc.start_date or not doc.end_date:
+		doc.custom_unpaid_days = 0.0
+		return
+
+	# Query all submitted Unpaid Days documents within salary slip date range
+	unpaid_days_docs = frappe.get_all(
+		"Unpaid Days",
+		filters={
+			"docstatus": 1,  # Only submitted documents
+			"payroll_date": ["between", [doc.start_date, doc.end_date]]
+		},
+		pluck="name"
+	)
+
+	# If no unpaid days documents found, set to 0
+	if not unpaid_days_docs:
+		doc.custom_unpaid_days = 0.0
+		return
+
+	# Sum all unpaid days for this employee from the details table
+	total_unpaid_days = 0.0
+
+	for unpaid_doc_name in unpaid_days_docs:
+		# Get all detail rows for this employee from this Unpaid Days document
+		employee_unpaid_days = frappe.get_all(
+			"Unpaid Days Detail",
+			filters={
+				"parent": unpaid_doc_name,
+				"parenttype": "Unpaid Days",
+				"employee": doc.employee
+			},
+			fields=["days"]
+		)
+
+		# Sum the days
+		for row in employee_unpaid_days:
+			if row.days:
+				total_unpaid_days += row.days
+
+	# Update the custom field
+	doc.custom_unpaid_days = total_unpaid_days

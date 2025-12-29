@@ -1,9 +1,12 @@
 import frappe
 from frappe import _
 from frappe.utils import flt, getdate, formatdate
+from gvm_payroll.gvm_payroll.report.report_utils import (
+	get_internal_salary_details,
+	get_salary_slip_details
+)
 
 salary_slip = frappe.qb.DocType("Salary Slip")
-salary_detail = frappe.qb.DocType("Salary Detail")
 
 
 def execute(filters=None):
@@ -18,9 +21,10 @@ def execute(filters=None):
 	if not salary_slips:
 		return [], []
 
-	# Fetch earnings and deductions separately
+	# Fetch earnings, deductions, and internal salary details separately
 	ss_earning_map = get_salary_slip_details(salary_slips, "earnings")
 	ss_ded_map = get_salary_slip_details(salary_slips, "deductions")
+	ss_internal_map = get_internal_salary_details(salary_slips)
 
 	# Get component names dynamically based on company and custom_report_type
 	component_names = get_component_names_by_report_type(company)
@@ -53,19 +57,22 @@ def execute(filters=None):
 
 	for idx, ss in enumerate(salary_slips, start=1):
 
-		# Basic Salary (from earnings, NOT part of total)
+		# Basic Salary (from earnings or internal salary details)
 		basic_amount = flt(
-			ss_earning_map.get(ss.name, {}).get(BASIC_COMPONENT, 0)
+			ss_earning_map.get(ss.name, {}).get(BASIC_COMPONENT, 0) or
+			ss_internal_map.get(ss.name, {}).get(BASIC_COMPONENT, 0)
 		)
 
-		# ESI Employee Contribution (from deductions)
+		# ESI Employee Contribution (from deductions or internal salary details)
 		esi_employee_amount = flt(
-			ss_ded_map.get(ss.name, {}).get(ESI_EMPLOYEE_COMPONENT, 0)
+			ss_ded_map.get(ss.name, {}).get(ESI_EMPLOYEE_COMPONENT, 0) or
+			ss_internal_map.get(ss.name, {}).get(ESI_EMPLOYEE_COMPONENT, 0)
 		)
 
-		# ESI Employer Contribution (from earnings)
+		# ESI Employer Contribution (from earnings or internal salary details)
 		esi_employer_amount = flt(
-			ss_earning_map.get(ss.name, {}).get(ESI_EMPLOYER_COMPONENT, 0)
+			ss_earning_map.get(ss.name, {}).get(ESI_EMPLOYER_COMPONENT, 0) or
+			ss_internal_map.get(ss.name, {}).get(ESI_EMPLOYER_COMPONENT, 0)
 		)
 
 		# TOTAL = ESI Employee + ESI Employer (Basic excluded)
@@ -155,30 +162,6 @@ def get_salary_slips(filters):
 	return query.run(as_dict=1) or []
 
 
-def get_salary_slip_details(salary_slips, component_type):
-	salary_slips = [ss.name for ss in salary_slips]
-
-	result = (
-		frappe.qb.from_(salary_slip)
-		.join(salary_detail)
-		.on(salary_slip.name == salary_detail.parent)
-		.where(
-			(salary_detail.parent.isin(salary_slips))
-			& (salary_detail.parentfield == component_type)
-		)
-		.select(
-			salary_detail.parent,
-			salary_detail.salary_component,
-			salary_detail.amount,
-		)
-	).run(as_dict=1)
-
-	ss_map = {}
-	for d in result:
-		ss_map.setdefault(d.parent, frappe._dict()).setdefault(d.salary_component, 0.0)
-		ss_map[d.parent][d.salary_component] += flt(d.amount)
-
-	return ss_map
 
 
 def get_component_names_by_report_type(company):
@@ -205,6 +188,3 @@ def get_component_names_by_report_type(company):
 			component_map["esi_employer"] = comp.name
 
 	return component_map
-
-
-
